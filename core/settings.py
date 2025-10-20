@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -205,11 +205,28 @@ CORS_ALLOW_HEADERS = [
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Allowed hosts
-ALLOWED_HOSTS = ['*']  # Em produção, especifique os domínios
+# --- Configurações de Produção ---
 
-# CORS para o frontend
+# Lista de domínios que podem acessar o backend
+ALLOWED_HOSTS = [
+    "financial-manager-back-production.up.railway.app",
+    "financial-manager-front.vercel.app",
+    "localhost",
+    "127.0.0.1",
+]
+
+# Domínios que podem fazer requisições (CORS)
 CORS_ALLOWED_ORIGINS = [
+    "https://financial-manager-front.vercel.app",
     "http://localhost:3000",
+    "http://localhost:5173", # Se usar Vite
+]
+
+# Domínios confiáveis para requisições POST (login, formulários)
+CSRF_TRUSTED_ORIGINS = [
+    "https://financial-manager-back-production.up.railway.app",
     "https://financial-manager-front.vercel.app",
 ]
+
+# Permite que o frontend envie cookies (necessário para login)
+CORS_ALLOW_CREDENTIALS = True
