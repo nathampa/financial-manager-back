@@ -76,22 +76,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# Database Configuration
-# Usa DATABASE_URL do Railway ou fallback para config local
-DATABASES = {
-    'default': dj_database_url.config(
-        default=config(
-            'DATABASE_URL',
-            default=f"postgresql://{config('DATABASE_USER', default='postgres')}:"
-                    f"{config('DATABASE_PASSWORD', default='postgres')}@"
-                    f"{config('DATABASE_HOST', default='localhost')}:"
-                    f"{config('DATABASE_PORT', default='5432')}/"
-                    f"{config('DATABASE_NAME', default='financial_manager')}"
-        ),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
