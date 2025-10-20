@@ -211,5 +211,5 @@ ALLOWED_HOSTS = ['*']  # Em produção, especifique os domínios
 # CORS para o frontend
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://seu-frontend.vercel.app",  # Adicionar depois
+    "https://financial-manager-front.vercel.app",
 ]
