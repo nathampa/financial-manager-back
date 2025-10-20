@@ -76,7 +76,34 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+# Database Configuration
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
+if DATABASE_URL:
+    # Produção (Railway) - usa DATABASE_URL
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    # Desenvolvimento local
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DATABASE_NAME', default='financial_manager'),
+            'USER': config('DATABASE_USER', default='postgres'),
+            'PASSWORD': config('DATABASE_PASSWORD', default='postgres'),
+            'HOST': config('DATABASE_HOST', default='localhost'),
+            'PORT': config('DATABASE_PORT', default='5432'),
+            'OPTIONS': {
+                'client_encoding': 'UTF8',
+            },
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
