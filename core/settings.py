@@ -1,10 +1,8 @@
 # backend/core/settings.py
 import sys
 import os
-import dj_database_url
 from pathlib import Path
 from decouple import config
-from datetime import timedelta
 
 # FORÇA UTF-8 ANTES DE TUDO (CRÍTICO!)
 if hasattr(sys.stdout, 'reconfigure'):
@@ -20,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -76,34 +74,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# Database Configuration
-DATABASE_URL = os.environ.get('DATABASE_URL')
-
-if DATABASE_URL:
-    # Produção (Railway) - usa DATABASE_URL
-    import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
+# Database - APENAS UMA VEZ!
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DATABASE_NAME', default='financial_manager'),
+        'USER': config('DATABASE_USER', default='postgres'),
+        'PASSWORD': config('DATABASE_PASSWORD', default='postgres'),
+        'HOST': config('DATABASE_HOST', default='localhost'),
+        'PORT': config('DATABASE_PORT', default='5432'),
+        'OPTIONS': {
+            'client_encoding': 'UTF8',
+        },
     }
-else:
-    # Desenvolvimento local
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DATABASE_NAME', default='financial_manager'),
-            'USER': config('DATABASE_USER', default='postgres'),
-            'PASSWORD': config('DATABASE_PASSWORD', default='postgres'),
-            'HOST': config('DATABASE_HOST', default='localhost'),
-            'PORT': config('DATABASE_PORT', default='5432'),
-            'OPTIONS': {
-                'client_encoding': 'UTF8',
-            },
-        }
-    }
+}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -158,6 +142,8 @@ REST_FRAMEWORK = {
 }
 
 # JWT Settings
+from datetime import timedelta
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
@@ -200,33 +186,3 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
-
-# WhiteNoise para servir arquivos estáticos
-MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# --- Configurações de Produção ---
-
-# Lista de domínios que podem acessar o backend
-ALLOWED_HOSTS = [
-    "financial-manager-back-production.up.railway.app",
-    "financial-manager-front.vercel.app",
-    "localhost",
-    "127.0.0.1",
-]
-
-# Domínios que podem fazer requisições (CORS)
-CORS_ALLOWED_ORIGINS = [
-    "https://financial-manager-front.vercel.app",
-    "http://localhost:3000",
-    "http://localhost:5173", # Se usar Vite
-]
-
-# Domínios confiáveis para requisições POST (login, formulários)
-CSRF_TRUSTED_ORIGINS = [
-    "https://financial-manager-back-production.up.railway.app",
-    "https://financial-manager-front.vercel.app",
-]
-
-# Permite que o frontend envie cookies (necessário para login)
-CORS_ALLOW_CREDENTIALS = True
